@@ -1,0 +1,42 @@
+version: "3"
+
+volumes:
+  mongodb_volume:
+
+services:
+  youtube_statistics:
+    build: StatisticManager/
+    restart: always
+    environment:
+      - TZ=Europe/Moscow
+      - YOUTUBE_CHANEL_ID=
+      - YOUTUBE_API_KEY=
+      - DAYS_STATISTICS_SEND_TIME=09:00
+      - DAYS_STATISTICS_SEND_TIME=23:00
+      - MONGO_DB_ADDR=mongodb
+      - MONGO_DB_PORT=27017
+      - RESPONSE_DELAY=120
+      - NOTIFICATION_SERVICE_URL=
+      - NOTIFICATION_SERVICE_CLIENT_ID=
+      - NOTIFICATION_SERVICE_MODE=prod
+      - STORAGE_SERVICE_IMPL=MongodbService
+      - LANGUAGE=RU
+      - BASE_REPORT_URL=http://yt.artyom-cloud.ru
+
+  web_service:
+    build: WebService/
+    restart: always
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=Europe/Moscow
+      - MONGO_DB_ADDR=mongodb
+      - MONGO_DB_PORT=27017
+      - STORAGE_SERVICE_IMPL=MongodbService
+      - LOG_MODE=dev
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - mongodb_volume:/data/db
+    restart: always
